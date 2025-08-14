@@ -26,12 +26,20 @@ export default function Home() {
     const res = await fetch(endpoint);
     const data = await res.json();
 
+    let updatedMovies;
     if (reset) {
-      setMovies(data.results);
+      updatedMovies = data.results;
     } else {
-      setMovies(prev => [...prev, ...data.results]);
+      // Merge previous movies with new ones and remove duplicates
+      const combined = [...movies, ...data.results];
+      const map = new Map();
+      combined.forEach((m) => {
+        if (!map.has(m.id)) map.set(m.id, m);
+      });
+      updatedMovies = Array.from(map.values());
     }
 
+    setMovies(updatedMovies);
     setHasMore(data.page < data.total_pages);
     setLoading(false);
     setPage(pageNumber);
@@ -63,7 +71,7 @@ export default function Home() {
     <MainLayout>
       <div className="p-5">
         <div className="flex">
-          <h1 className="text-5xl block ml-auto ">Popular Movies</h1>
+          <h1 className="text-5xl block ml-auto">Popular Movies</h1>
 
           {/* Search Bar */}
           <form onSubmit={handleSearch} className="mb-4 ml-auto">
@@ -72,7 +80,7 @@ export default function Home() {
               placeholder="Search for a movie..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="bg-white/20 transition-all duration-300 ease-in-out w-50 focus:w-100 flex-1 px-4 py-2 border border-pink-600 rounded-lg focus:outline-none focus:ring-1 focus:ring-pink-600 "
+              className="bg-white/20 transition-all duration-300 ease-in-out w-50 focus:w-100 flex-1 px-4 py-2 border border-pink-600 rounded-lg focus:outline-none focus:ring-1 focus:ring-pink-600"
             />
           </form>
         </div>
@@ -80,13 +88,16 @@ export default function Home() {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           {movies.map((movie) => (
             <Link key={movie.id} href={`/movies/${movie.id}`}>
-              <div className="bg-white p-2 rounded-lg shadow-md hover:shadow-xl hover:scale-[1.02] transition-all duration-300">
+              <div className="bg-white p-2 rounded-lg shadow-md hover:shadow-xl hover:scale-[1.02] transition-all duration-300 relative">
                 <img
                   src={`https://image.tmdb.org/t/p/w300${movie.poster_path}`}
                   alt={movie.title}
                   className="rounded w-60 h-82"
                 />
-                <h2 title={movie.title} className="truncate mt-2 text-lg font-semibold text-gray-900">
+                <h2
+                  title={movie.title}
+                  className="truncate mt-2 text-lg font-semibold text-gray-900"
+                >
                   {movie.title}
                 </h2>
                 <div className="absolute top-2 right-2 bg-black/70 text-white px-2 py-1 rounded text-sm">
