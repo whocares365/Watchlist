@@ -5,33 +5,45 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Header from "../_components/header";
 
-import { auth, googleProvider, githubProvider } from "@/lib/firebase";
-import { signInWithPopup, signInWithEmailAndPassword } from "firebase/auth";
+import { 
+  auth, 
+  googleProvider, 
+  githubProvider 
+} from "@/lib/firebase";
+import { 
+  signInWithPopup, 
+  signInWithEmailAndPassword, 
+  fetchSignInMethodsForEmail 
+} from "firebase/auth";
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleGoogleLogin = async () => {
+  const handleProviderLogin = async (provider) => {
     try {
-      await signInWithPopup(auth, googleProvider);
+      await signInWithPopup(auth, provider);
       router.push("/");
     } catch (err) {
-      console.error("Google login error:", err);
-      alert(err.message || "Google sign-in failed");
+      console.error(`${provider.providerId} login error:`, err);
+
+      if (err.code === "auth/account-exists-with-different-credential") {
+        const email = err.customData.email;
+        const methods = await fetchSignInMethodsForEmail(auth, email);
+        alert(
+          `An account already exists with this email using: ${methods.join(
+            ", "
+          )}. Please sign in with that provider first.`
+        );
+      } else {
+        alert(err.message || "Sign-in failed");
+      }
     }
   };
 
-  const handleGithubLogin = async () => {
-    try {
-      await signInWithPopup(auth, githubProvider);
-      router.push("/");
-    } catch (err) {
-      console.error("GitHub login error:", err);
-      alert(err.message || "GitHub sign-in failed");
-    }
-  };
+  const handleGoogleLogin = () => handleProviderLogin(googleProvider);
+  const handleGithubLogin = () => handleProviderLogin(githubProvider);
 
   const handleEmailLogin = async (e) => {
     e.preventDefault();

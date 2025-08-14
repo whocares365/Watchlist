@@ -4,21 +4,26 @@ import { useEffect, useState } from "react";
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import MainLayout from "@/app/_components/layout";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function ProfilePage() {
   const [user, setUser] = useState(null);
   const [loadingUser, setLoadingUser] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+      if (!currentUser) {
+        router.push("/"); // redirect immediately
+      } else {
+        setUser(currentUser);
+      }
       setLoadingUser(false);
     });
     return () => unsubscribe();
-  }, []);
+  }, [router]);
 
-  if (loadingUser) {
+  if (loadingUser || !user) {
     return <p className="p-4 text-center text-gray-500">Checking user authentication...</p>;
   }
 
@@ -41,8 +46,6 @@ export default function ProfilePage() {
 
         <h1 className="text-2xl font-semibold text-gray-900">{displayName || "User"}</h1>
         <p className="text-gray-700 break-all">{email}</p>
-
-        {/* Optional: Add a logout button here or a link to settings */}
       </div>
     </MainLayout>
   );

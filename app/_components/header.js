@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation"; 
 
 export default function Header() {
   const [user, setUser] = useState(null);
@@ -18,8 +18,8 @@ export default function Header() {
   const router = useRouter();
   
   const handleLogout = async () => {
-    await signOut(auth);
     router.push("/");
+    await signOut(auth);
   };
 
   return (
