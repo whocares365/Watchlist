@@ -1,103 +1,106 @@
-import Image from "next/image";
+"use client";
+
+import { useState, useEffect, useRef, useCallback } from "react";
+import Link from "next/link";
+import MainLayout from "./_components/layout";
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [movies, setMovies] = useState([]);
+  const [query, setQuery] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const loaderRef = useRef(null);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+  useEffect(() => {
+    fetchMovies(1, query, true);
+  }, [query]);
+
+  const fetchMovies = async (pageNumber, searchTerm = "", reset = false) => {
+    setLoading(true);
+
+    const endpoint = searchTerm
+      ? `https://api.themoviedb.org/3/search/movie?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&language=en-US&query=${encodeURIComponent(searchTerm)}&page=${pageNumber}`
+      : `https://api.themoviedb.org/3/movie/popular?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&language=en-US&page=${pageNumber}`;
+
+    const res = await fetch(endpoint);
+    const data = await res.json();
+
+    if (reset) {
+      setMovies(data.results);
+    } else {
+      setMovies(prev => [...prev, ...data.results]);
+    }
+
+    setHasMore(data.page < data.total_pages);
+    setLoading(false);
+    setPage(pageNumber);
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (!query.trim()) return fetchMovies(1, "", true);
+    fetchMovies(1, query, true);
+  };
+
+  // Infinite scroll intersection observer
+  const loadMore = useCallback(
+    (entries) => {
+      if (entries[0].isIntersecting && hasMore && !loading) {
+        fetchMovies(page + 1, query);
+      }
+    },
+    [hasMore, loading, page, query]
+  );
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(loadMore, { threshold: 1 });
+    if (loaderRef.current) observer.observe(loaderRef.current);
+    return () => observer.disconnect();
+  }, [loadMore]);
+
+  return (
+    <MainLayout>
+      <div className="p-5">
+        <div className="flex">
+          <h1 className="text-5xl block ml-auto ">Popular Movies</h1>
+
+          {/* Search Bar */}
+          <form onSubmit={handleSearch} className="mb-4 ml-auto">
+            <input
+              type="text"
+              placeholder="Search for a movie..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              className="bg-white/20 transition-all duration-300 ease-in-out w-50 focus:w-100 flex-1 px-4 py-2 border border-pink-600 rounded-lg focus:outline-none focus:ring-1 focus:ring-pink-600 "
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+          </form>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          {movies.map((movie) => (
+            <Link key={movie.id} href={`/movies/${movie.id}`}>
+              <div className="bg-white p-2 rounded-lg shadow-md hover:shadow-xl hover:scale-[1.02] transition-all duration-300">
+                <img
+                  src={`https://image.tmdb.org/t/p/w300${movie.poster_path}`}
+                  alt={movie.title}
+                  className="rounded w-60 h-82"
+                />
+                <h2 title={movie.title} className="truncate mt-2 text-lg font-semibold text-gray-900">
+                  {movie.title}
+                </h2>
+                <div className="absolute top-2 right-2 bg-black/70 text-white px-2 py-1 rounded text-sm">
+                  ⭐ {movie.vote_average?.toFixed(1)}
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        {/* Infinite scroll loader */}
+        {loading && <p className="mt-4 text-center text-gray-500">Loading...</p>}
+        <div ref={loaderRef} className="h-10"></div>
+      </div>
+    </MainLayout>
   );
 }
