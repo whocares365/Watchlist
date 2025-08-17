@@ -85,14 +85,14 @@ export default function Home() {
           </form>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
           {movies.map((movie) => (
             <Link key={movie.id} href={`/movies/${movie.id}`}>
               <div className="bg-white p-2 rounded-lg shadow-md hover:shadow-xl hover:scale-[1.02] transition-all duration-300 relative">
                 <img
                   src={`https://image.tmdb.org/t/p/w300${movie.poster_path}`}
                   alt={movie.title}
-                  className="rounded w-60 h-82"
+                  className="rounded"
                 />
                 <h2
                   title={movie.title}

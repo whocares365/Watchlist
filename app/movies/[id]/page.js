@@ -140,7 +140,7 @@ export default function MovieDetail() {
 
   return (
     <MainLayout>
-      <div className="max-w-5xl mx-auto bg-white rounded-lg shadow-lg p-6 flex flex-col md:flex-row gap-6">
+      <div className="max-w-5xl mx-auto bg-white/80 rounded-lg shadow-lg p-6 flex flex-col md:flex-row gap-6">
         {/* Poster */}
         {movie.poster_path && (
           <img

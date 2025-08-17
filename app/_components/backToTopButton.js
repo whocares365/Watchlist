@@ -22,7 +22,7 @@ export default function BackToTopButton() {
         <button
           onClick={scrollToTop}
           aria-label="Scroll to top"
-          className="fixed bottom-16 right-12 bg-white/20 transition text-white p-3 rounded-full shadow-lg duration-300"
+          className="fixed bottom-16 right-12 bg-white/20 transition text-white p-3 rounded-full shadow-lg duration-300 hover:bg-white/30"
           style={{ zIndex: 1000 }}
         >
           {/* Simple Up Arrow SVG */}

@@ -43,10 +43,10 @@ export default function Header() {
   }, [lastScrollY]);
 
   return (
-    <header className={`mb-10 flex items-center justify-between px-6 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-opacity-90 backdrop-blur-md shadow-lg sticky top-0 z-50 transform duration-300 ${showHeader ? "translate-y-0" : "-translate-y-full"}`}>
+    <header className={`min-w-158 mb-10 flex items-center justify-between px-6 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-opacity-90 backdrop-blur-md shadow-lg sticky top-0 z-50 transform duration-300 ${showHeader ? "translate-y-0" : "-translate-y-full"}`}>
       <Link href="/" className="py-1 text-2xl font-bold text-black">
       <div className="flex">
-        <span className="text-6xl mt-1">🎬</span> <Image src="/logo.png" width={170} height={10} alt={"watchlist"}></Image>
+        <span className="lg:text-6xl  mt-1 ">🎬</span> <Image src="/logo.png" width={170} height={10} alt={"watchlist"}></Image>
       </div>
       </Link>
 
@@ -56,19 +56,19 @@ export default function Header() {
     <div className="flex items-center overflow-hidden shadow-md rounded-md">
       <Link 
         href="/favorites" 
-        className="border-1 rounded-l-md  border-pink-600 flex items-center justify-center w-32 h-14 text-white bg-white/10 hover:bg-white/20 hover:shadow-lg active:scale-95 duration-200"
+        className="border-1 rounded-l-md  border-pink-600 flex items-center justify-center lg:w-32 w-20 h-14 text-white bg-white/10 hover:bg-white/20 hover:shadow-lg active:scale-95 duration-200"
       >
         Favorites
       </Link>
       <Link 
         href="/watchlater" 
-        className="border-y-1  border-pink-600 flex items-center justify-center w-32 h-14 text-white bg-white/10 hover:bg-white/20 hover:shadow-lg active:scale-95 duration-200"
+        className="border-y-1  border-pink-600 flex items-center justify-center lg:w-32 w-20 h-14 text-white bg-white/10 hover:bg-white/20 hover:shadow-lg active:scale-95 duration-200"
       >
         Watch Later
       </Link>
       <Link 
         href="/watched" 
-        className="border-1 rounded-r-md border-pink-600 flex items-center justify-center w-32 h-14 text-white bg-white/10 hover:bg-white/20 hover:shadow-lg active:scale-95 duration-200"
+        className="border-1 rounded-r-md border-pink-600 flex items-center justify-center lg:w-32 w-20 h-14 text-white bg-white/10 hover:bg-white/20 hover:shadow-lg active:scale-95 duration-200"
       >
         Watched
       </Link>
@@ -83,7 +83,7 @@ export default function Header() {
     <div className="flex items-center justify-center">
       <button
         onClick={handleLogout}
-        className="border-1 border-pink-600 rounded-md  text-white h-14 w-15 shadow-md bg-white/10 hover:bg-white/20 hover:shadow-lg active:scale-95 duration-200"
+        className="sm:mr-3 border-1 border-pink-600 rounded-md  text-white h-14 w-15 shadow-md bg-white/10 hover:bg-white/20 hover:shadow-lg active:scale-95 duration-200"
       >
         Log out
       </button>
